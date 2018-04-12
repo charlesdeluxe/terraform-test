@@ -16,7 +16,7 @@ variable "ssh_private_key_filename" {
 
 variable "aws_ami" {
   description = "ami to use"
-  default = "ami-43a15f3e"
+  default = "ami-4e79ed36"
 }
 
 variable "aws_profile" {
@@ -26,7 +26,7 @@ variable "aws_profile" {
 
 variable "aws_region" {
   description = "AWS region to launch servers."
-  default     = "us-east-1"
+  default     = "us-west-2"
 }
 
 variable "bucket_name" {

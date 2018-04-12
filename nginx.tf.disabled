@@ -1,3 +1,6 @@
+# This file deploys 3 nginx hosts.  It is deprecated by auto_scaling_group.tf.
+
+
 resource "aws_instance" "nginx" {
   connection {
     user = "ubuntu"
