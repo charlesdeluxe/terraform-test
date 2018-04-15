@@ -28,7 +28,7 @@ resource "aws_subnet" "public" {
 }
 
 
-# Create s3 bucket
+# Create s3 bucket for nginx files
 resource "aws_s3_bucket" "test_bucket" {
   bucket = "${var.bucket_name}"
   acl    = "private"
@@ -47,6 +47,11 @@ resource "aws_s3_bucket_object" "object" {
   depends_on = ["aws_s3_bucket.test_bucket"]
 }
 
+# # Create s3 bucket for ELB access logs
+# resource "aws_s3_bucket_object" "logs" {
+#   bucket = "${var.logs_bucket_name}"
+#   acl = "private"
+# }
 
 # Create an internet gateway for egress
 resource "aws_internet_gateway" "default" {
@@ -97,7 +102,58 @@ resource "aws_security_group" "nginx" {
   }
 }
 
+# Create ELB
+resource "aws_elb" "test" {
+  name               = "nginx-elb"
+  subnets = ["${aws_subnet.public.id}"] 
+  connection_draining = true
+  idle_timeout = 300
 
+
+  # access_logs {
+  #   bucket        = "foo"
+  #   bucket_prefix = "bar"
+  #   interval      = 60
+  # }
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  # listener {
+  #   instance_port      = 80
+  #   instance_protocol  = "http"
+  #   lb_port            = 443
+  #   lb_protocol        = "https"
+  #   # ssl_certificate_id = "arn:aws:iam::123456789012:server-certificate/certName"
+  # }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:80/"
+    interval            = 30
+  }
+
+  # instances                   = ["${aws_instance.nginx.id}"]
+  idle_timeout                = 400
+  connection_draining         = true
+  connection_draining_timeout = 400
+
+  tags {
+    Name = "nginx-elb"
+  }
+}
+
+
+output "ELB DNS" {
+  value = "${aws_elb.test.dns_name}"
+}
+# Create SSL certificate? needed?
 
 
 

@@ -27,7 +27,6 @@ resource "aws_launch_configuration" "as_conf" {
   root_block_device {
     volume_size = "${var.aws_nginx_instance_disk_size}"
   }
-
   lifecycle {
     create_before_destroy = true
   }
@@ -39,6 +38,12 @@ resource "aws_autoscaling_group" "test" {
   vpc_zone_identifier       = ["${aws_subnet.public.id}"]
   min_size             = 3
   max_size             = 5
+
+  health_check_grace_period = 300
+  health_check_type         = "ELB"
+
+  target_group_arns = ["${aws_elb.test.arn}"]
+
 
   lifecycle {
     create_before_destroy = true

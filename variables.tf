@@ -28,6 +28,11 @@ variable "bucket_name" {
   default     = "hipc3u7pmjdg3ojq3"
 }
 
+# variable "logs_bucket_name" {
+#   description = "Name of S3 bucket for ELB logs"
+#   default     = "elb-logs-hftiih9p"
+# }
+
 variable "aws_nginx_instance_disk_size" {
   description = "default size of the root disk (GB)"
   default = "10"
