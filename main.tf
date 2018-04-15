@@ -21,9 +21,24 @@ tags {
 }
 
 # Create Subnet
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public_b" {
   vpc_id                  = "${aws_vpc.test.id}"
+  availability_zone = "us-west-2b"
   cidr_block              = "10.0.0.0/22"
+  map_public_ip_on_launch = true
+}
+
+resource "aws_subnet" "public_a" {
+  vpc_id                  = "${aws_vpc.test.id}"
+  availability_zone = "us-west-2a"
+  cidr_block              = "10.0.4.0/22"
+  map_public_ip_on_launch = true
+}
+
+resource "aws_subnet" "public_c" {
+  vpc_id                  = "${aws_vpc.test.id}"
+  availability_zone = "us-west-2c"
+  cidr_block              = "10.0.8.0/22"
   map_public_ip_on_launch = true
 }
 
@@ -70,7 +85,7 @@ resource "aws_route" "internet_access" {
 # Create security group
 resource "aws_security_group" "nginx" {
   name        = "nginx-security-group"
-  description = "A security group for the elb"
+  description = "A security group for nginx hosts"
   vpc_id      = "${aws_vpc.test.id}"
 
   ingress {
@@ -102,56 +117,64 @@ resource "aws_security_group" "nginx" {
   }
 }
 
-# Create ELB
-resource "aws_elb" "test" {
-  name               = "nginx-elb"
-  subnets = ["${aws_subnet.public.id}"] 
-  connection_draining = true
-  idle_timeout = 300
-
-
-  # access_logs {
-  #   bucket        = "foo"
-  #   bucket_prefix = "bar"
-  #   interval      = 60
-  # }
-
-  listener {
-    instance_port     = 80
-    instance_protocol = "http"
-    lb_port           = 80
-    lb_protocol       = "http"
+resource "aws_security_group" "lb_sg" {
+  name = "lb-security-group"
+  description = "security group for the load balancer"
+  vpc_id = "${aws_vpc.test.id}"
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-
-  # listener {
-  #   instance_port      = 80
-  #   instance_protocol  = "http"
-  #   lb_port            = 443
-  #   lb_protocol        = "https"
-  #   # ssl_certificate_id = "arn:aws:iam::123456789012:server-certificate/certName"
-  # }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 3
-    target              = "HTTP:80/"
-    interval            = 30
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]      
   }
-
-  # instances                   = ["${aws_instance.nginx.id}"]
-  idle_timeout                = 400
-  connection_draining         = true
-  connection_draining_timeout = 400
-
-  tags {
-    Name = "nginx-elb"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
+# Create load balancer
+resource "aws_lb" "test" {
+  name               = "nginx-lb"
+  internal = false
+  subnets = ["${aws_subnet.public_a.id}","${aws_subnet.public_b.id}", "${aws_subnet.public_c.id}"] 
+  security_groups = ["${aws_security_group.lb_sg.id}"]
+  idle_timeout = 300
 
-output "ELB DNS" {
-  value = "${aws_elb.test.dns_name}"
+  tags {
+    Name = "nginx-lb"
+  }
+}
+
+resource "aws_lb_target_group" "test" {
+  name     = "nginx-lb-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.test.id}"
+}
+
+
+
+resource "aws_lb_listener" "test" {
+  load_balancer_arn = "${aws_lb.test.arn}"
+  port = "80"
+  protocol = "HTTP"
+  default_action {
+    target_group_arn = "${aws_lb_target_group.test.arn}"
+    type = "forward"
+  }
+}
+
+output "LB DNS" {
+  value = "${aws_lb.test.dns_name}"
 }
 # Create SSL certificate? needed?
 

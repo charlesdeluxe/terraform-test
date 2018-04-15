@@ -35,14 +35,14 @@ resource "aws_launch_configuration" "as_conf" {
 resource "aws_autoscaling_group" "test" {
   name                 = "test"
   launch_configuration = "${aws_launch_configuration.as_conf.name}"
-  vpc_zone_identifier       = ["${aws_subnet.public.id}"]
+  vpc_zone_identifier       = ["${aws_subnet.public_a.id}","${aws_subnet.public_b.id}","${aws_subnet.public_c.id}"]
   min_size             = 3
   max_size             = 5
 
   health_check_grace_period = 300
   health_check_type         = "ELB"
 
-  target_group_arns = ["${aws_elb.test.arn}"]
+  target_group_arns = ["${aws_lb_target_group.test.arn}"]
 
 
   lifecycle {
