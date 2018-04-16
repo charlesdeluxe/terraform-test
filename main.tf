@@ -173,6 +173,21 @@ resource "aws_lb_listener" "test" {
   }
 }
 
+
+resource "aws_lb_listener" "test-https" {
+  load_balancer_arn = "${aws_lb.test.arn}"
+  port = "443"
+  protocol = "HTTPS"
+  # ssl_policy        = "ELBSecurityPolicy-2015-05"
+  certificate_arn   = "arn:aws:acm:us-west-2:114880118347:certificate/cecee3b1-f943-4fcb-b06a-98f2f349e1a6"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.test.arn}"
+    type="forward"
+  }
+}
+
+
 output "LB DNS" {
   value = "${aws_lb.test.dns_name}"
 }

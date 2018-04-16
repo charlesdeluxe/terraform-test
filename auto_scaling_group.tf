@@ -40,9 +40,22 @@ resource "aws_autoscaling_group" "test" {
   max_size             = 5
 
   health_check_grace_period = 300
-  health_check_type         = "ELB"
+  health_check_type         = "EC2"
 
   target_group_arns = ["${aws_lb_target_group.test.arn}"]
+
+  tags = [
+    {
+      key = "Name"
+      value = "nginx"
+      propagate_at_launch = true
+    },
+    {
+      key = "owner"
+      value = "Charles"
+      propagate_at_launch = true
+    },
+  ]
 
 
   lifecycle {
@@ -50,6 +63,21 @@ resource "aws_autoscaling_group" "test" {
   }
   
   depends_on = ["aws_s3_bucket_object.object"]
+}
+
+resource "aws_autoscaling_policy" "test" {
+  name  = "test"
+  adjustment_type = "ChangeInCapacity"
+  policy_type = "TargetTrackingScaling"
+  autoscaling_group_name = "${aws_autoscaling_group.test.name}"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 1
+  }
+
 }
 
 
