@@ -19,7 +19,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_launch_configuration" "as_conf" {
   name_prefix   = "nginx-"
   image_id      = "${data.aws_ami.ubuntu.id}"
-  instance_type = "t2.micro"
+  instance_type = "${var.aws_nginx_instance_type}"
   key_name      = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.nginx.id}"]
   user_data     = "${file("setup.sh")}"

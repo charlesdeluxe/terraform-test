@@ -35,7 +35,7 @@ variable "aws_nginx_instance_disk_size" {
 
 variable "aws_nginx_instance_type" {
   description = "AWS instance type"
-  default = "t2.large"
+  default = "t2.micro"
 }
 
 variable "num_of_nginx" {
