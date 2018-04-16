@@ -22,16 +22,11 @@ variable "aws_region" {
   default     = "us-west-2"
 }
 
-# bucket is presently hard-coded in setup.sh -- cmims 2018-04-12
+# bucket is presently hard-coded in setup.sh and iam.tf -- cmims 2018-04-12
 variable "bucket_name" {
   description = "Name of S3 bucket"
   default     = "hipc3u7pmjdg3ojq3"
 }
-
-# variable "logs_bucket_name" {
-#   description = "Name of S3 bucket for ELB logs"
-#   default     = "elb-logs-hftiih9p"
-# }
 
 variable "aws_nginx_instance_disk_size" {
   description = "default size of the root disk (GB)"

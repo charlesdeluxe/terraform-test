@@ -23,6 +23,7 @@ resource "aws_iam_instance_profile" "nginx" {
 }
 
 
+# TODO interpolation for bucket name
 resource "aws_iam_role_policy" "nginx" {
   name = "nginx_iam_role_policy"
   role = "${ aws_iam_role.nginx.id }"
@@ -32,8 +33,21 @@ resource "aws_iam_role_policy" "nginx" {
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": ["s3:*"],
-      "Resource": ["*"]
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::hipc3u7pmjdg3ojq3"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::hipc3u7pmjdg3ojq3/*"]
     }
   ]
 }
