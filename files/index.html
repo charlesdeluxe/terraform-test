@@ -4,7 +4,29 @@
 </head>
 <body>
 <p>
-	This file was obtained from a private s3 bucket.
+	This file was obtained from a private s3 bucket.<br>
+	<a href="https://github.com/charlesdeluxe/terraform-test">https://github.com/charlesdeluxe/terraform-test</a>
 </p>
+<p>
+	Features:
+	<ul>
+		<li>Creates new VPC</li>
+		<li>Creates subnets in 3 availability zones in us-west-2</li>
+		<li>Creates S3 bucket and copies this file into it</li>
+		<li>Creates internet gateway so that traffic can egress from nginx hosts</li>
+		<li>Configures route for egress traffic</li>
+		<li>Creates security group for nginx hosts</li>
+		<li>Creates security group for alb load balancer</li>
+		<li>Creates load balancer, with target_group and http and https listeners</li>
+		<li>Creates IAM role, role_policy, and instance profile</li>
+		<li>Creates autoscaling group which launches latest canonical ubuntu with IAM profile to access private S3 bucket, installs nginx, copies this file to nginx root directory using user_data</li>
+		<li>Outputs the ELB dns name</li>
+	</ul>
+</p>
+<p>
+I created an acm certificate for https access on these hosts, and I manually configured <a href="https://nginx.mims.io">nginx.mims.io</a> to point to the load balancer for easy verification.
+</p>
+HOSTNAME
+
 </body>
 </html>

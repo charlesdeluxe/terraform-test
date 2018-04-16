@@ -62,11 +62,6 @@ resource "aws_s3_bucket_object" "object" {
   depends_on = ["aws_s3_bucket.test_bucket"]
 }
 
-# # Create s3 bucket for ELB access logs
-# resource "aws_s3_bucket_object" "logs" {
-#   bucket = "${var.logs_bucket_name}"
-#   acl = "private"
-# }
 
 # Create an internet gateway for egress
 resource "aws_internet_gateway" "default" {
@@ -178,7 +173,6 @@ resource "aws_lb_listener" "test-https" {
   load_balancer_arn = "${aws_lb.test.arn}"
   port = "443"
   protocol = "HTTPS"
-  # ssl_policy        = "ELBSecurityPolicy-2015-05"
   certificate_arn   = "arn:aws:acm:us-west-2:114880118347:certificate/cecee3b1-f943-4fcb-b06a-98f2f349e1a6"
 
   default_action {
@@ -191,7 +185,6 @@ resource "aws_lb_listener" "test-https" {
 output "LB DNS" {
   value = "${aws_lb.test.dns_name}"
 }
-# Create SSL certificate? needed?
 
 
 
